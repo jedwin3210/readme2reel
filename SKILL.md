@@ -4,7 +4,7 @@ description: |
   Bring a repository's README and docs back in line with what the code does today, then turn the verified docs into a short video reel. Use whenever the user says "update the README", "docs are out of date", "sync docs with code", "I added X, document it", "someone cloned this and got confused", "make a video of this repo", "turn the README into a reel", "launch video", "demo video for the docs", or asks whether the docs still match the code. Also use after adding, renaming, or removing a feature, flag, command, env var, or module. Fixes stale install commands, renamed flags, removed features, missing env vars, wrong paths, and undocumented modules with minimal diffs, and builds the reel as editable Remotion code from facts it has checked.
 license: MIT
 metadata:
-  version: "0.1.1"
+  version: "0.3.0"
 ---
 
 # readme2reel: true docs, then a reel of them
@@ -36,7 +36,7 @@ Choose from the request. When unsure, use sync.
 | Audit | "is the README stale?", "check the docs", "what's wrong with our docs" | Findings with evidence. No edits. |
 | Sync (default) | "update the README", "fix the docs", "sync docs with code" | Unified diff plus one line per change. Apply only when asked. |
 | Embedded | Another task just changed code ("I added X, document it", or a caller after a feature) | Edits to the sections that change touched, and nothing else. |
-| Reel | "make a video", "turn the README into a reel", "launch video" | Storyboard, then a Remotion project, then a preview. Render only when asked. |
+| Reel | "make a video", "turn the README into a reel", "launch video" | Storyboard → `.readme2reel/` → Studio → **`out/reel.mp4`**. The MP4 is the deliverable. |
 
 Reel mode always runs an audit first. If the audit finds drift, propose the sync before you write the storyboard, because the reel must come from true docs.
 
@@ -98,52 +98,71 @@ End with counts (stale, removed, missing, TODO) and what you checked. If there a
 
 ## Step 5: Make the reel
 
-Only in reel mode, and only from docs that passed Step 2. Read `references/reel.md` before you write any video code. It covers project setup, scene patterns, and rendering.
+Only in reel mode, and only from docs that passed Step 2. Read `references/reel.md` before you write any video code. It covers craft, scale, scaffolding, and rendering.
+
+A reel that is true but boring still fails. The job is a short **video** someone would finish with the sound off — one takeaway, the product **in motion** (cursor clicks, typed commands, punch-in panels, hard cuts), at readable scale — not a logo splash, not a slideshow of static screenshots, and not a Remotion dump in the user's face.
+
+**The MP4 is the product.** After the storyboard is approved (or the user already said "make the reel" / "make the video"), build, play-check, and **render** `.readme2reel/out/reel.mp4` in the same turn. Do not stop at Studio. Report the absolute path, duration, and size.
+
+### Hide the scaffolding
+
+Put the entire Remotion project under `.readme2reel/` (dot folder). Add a single line to the project's `.gitignore` if missing:
+
+```
+.readme2reel/
+```
+
+Do not create a visible `reel/` folder. Do not ask the user to commit `node_modules`, lockfiles, Studio config, or intermediate stills. Show the storyboard in chat and write it to `.readme2reel/storyboard.md`. Copy scene templates from this skill's `templates/remotion/` into `.readme2reel/src/` (see `templates/remotion/README.md`) instead of inventing a slideshow. Render to `.readme2reel/out/reel.mp4`. Scaffolding is disposable; the storyboard and the **mp4** are the deliverables.
 
 ### Write the storyboard first
 
-Write `reel/storyboard.md` and show it to the user before you build anything. Changing a storyboard is cheap. Changing an animated scene is not. Each scene gets a duration, the one thing the viewer should notice, the on-screen text, and the doc line it comes from.
+Show the storyboard to the user before you build anything. Changing a plan is cheap. Changing animated scenes is not.
 
-**Pick the form from the product surface, not from habit.** Storyboard the thing a user opens first. For a website, app, or marketing homepage, that is the real UI. For a CLI or library, that is the command or import. Do not default a product or homepage repo to an install → typed command → bullets slideshow; use that arc only when the product itself is the CLI or API.
+1. **Lock one takeaway.** One sentence the viewer must remember, taken from the verified README (not invented). If you cannot say it in one line, the video has no spine.
+2. **Pick the form from the product surface.** Website or app → real UI. CLI or library → command or import. Never default a homepage to install → typed command → bullets. Never default a product site to a slideshow of every nav page.
+3. **Beat sheet, then durations.** Use the five-beat spine: **Hook → Problem → Reveal → Proof → CTA**. Drop a beat only with a reason. Do not reorder past the hook. Cap social reels at **15–30 s** and **at most five scenes**. Prefer fewer, longer UI beats over many short slides.
+4. **Hook is not the logo.** The first ~3 s open on the result, the tension, or a bold verified claim. The mark can sit in a corner; a logo splash as scene 1 is a hard fail.
+5. Each scene lists: beat, duration, the one thing to notice, on-screen copy (real words), **action** (what moves or gets clicked), visual brief, and the doc or code `source` line. If the action column is empty, it is a still — rewrite it.
 
-Default arc when the product is a website or app, 30 to 45 seconds:
+Default beats when the product is a website or app:
 
-1. **Hook, 3 s:** what it does, in the README's one-line description, with the current brand mark.
-2. **Product UI, 10 to 18 s:** real screens from the repo or a running preview, one surface per beat.
-3. **Proof, 6 to 9 s:** at most three verified claims from the README, one per beat.
-4. **Call to action, 3 s:** the site URL or signup path from the docs.
+1. **Hook, 2.5–3.5 s:** the takeaway or tension over the primary UI in motion — not a logo card, not a frozen hero PNG.
+2. **Problem, 3–4 s (optional):** the pain the README names, as a punch panel or one hard visual — not a paragraph card.
+3. **Reveal, 5–10 s:** the product **doing** the thing: cursor moves and clicks, a control responds, a short screen recording, or a typed flow. One key action, held long enough to read.
+4. **Proof, 4–6 s:** one verified claim or second beat with motion. Skip if the README has nothing concrete.
+5. **CTA, 2.5–3.5 s:** one URL or action from the docs.
 
-Default arc when the product is a CLI or library, 30 to 45 seconds:
+Default beats when the product is a CLI or library:
 
-1. **Hook, 3 s:** what the project does, in the README's own one-line description.
-2. **Problem, 4 to 6 s:** the pain it removes, only if the README states one.
-3. **Install, 4 s:** the exact verified install command.
-4. **Use, 8 to 12 s:** one real example from the docs, typed out. Show output only if the docs or repo contain it. Never fabricate terminal output.
-5. **Features, 6 to 9 s:** at most three, taken from the README, one per beat.
-6. **Call to action, 3 s:** the repo URL or package name.
+1. **Hook, 2.5–3.5 s:** the takeaway (what changes for the user).
+2. **Problem, 3–4 s (optional):** only if the README states one.
+3. **Reveal / Use, 6–10 s:** one real install or command from the docs, typed out. Show output only if the repo contains it.
+4. **Proof, 4–6 s:** at most two verified features or flags, one idea each.
+5. **CTA, 2.5–3.5 s:** repo URL or package name.
 
-Cut any scene the docs cannot support. A 20-second true reel beats a 45-second padded one.
+Cut any scene the docs cannot support. A 18-second true reel beats a 40-second page tour.
 
 ### Design rules
 
-You are designing a video, not a web page. A viewer gets each frame once, at the video's pace, often muted on a phone. `references/reel.md` has the layout and asset detail.
+You are designing a muted phone **video**, not a slide deck of PNGs. Motion recipes live in `references/reel.md`.
 
-- **One idea per scene.** Build the frame around the thing the viewer should notice first.
-- **Readable at a glance.** Use at least 84 px headlines and 44 px supporting text at 1080 px width. Show at most 8 lines of code per scene, at 36 px or larger. Hold each scene long enough to read it twice.
-- **Safe area.** Keep key text 80 px from the sides and 100 px from the top and bottom, so platform UI does not cover it.
-- **Silent-first.** Every point must land with the sound off. Audio is optional. If you add music, use a real track from the repo or skip; never invent sine or noise pads. Silent-first still wins.
-- **Motion with purpose.** Animate to direct attention, such as typing a command or highlighting a flag. Prefer quick eased entrances, roughly 0.3 s, over constant movement.
-- **Brand.** Prefer the newest logo or mark in the repo. Rank by path name, file mtime, and what the live site or navbar uses, then copy that file into `reel/public/`.
-- **Real UI for apps.** If the project is a website or app, the reel must show recognizable product UI: a phone viewport (about 390 by 844 inside the 9:16 frame) or a letterboxed full-width desktop shot. Never use `object-fit: cover` or Ken Burns on a landscape screenshot in a vertical frame.
-- **The project's look.** Take colors and fonts from the repo when it has them. Otherwise use one neutral palette with one accent color.
-- **Format.** Build 1080 by 1920 vertical by default. Add a 1920 by 1080 landscape version on request.
+- **Motion is mandatory.** Every reveal/proof beat needs a visible action: cursor path + click ring, typed command, panel flash/punch-in, UI state change, or a short screen recording. A sequence of full-screen screenshots with captions is a hard fail — that is a slideshow, not a reel.
+- **One idea per scene.** Caption states the takeaway for that beat, not a page title ("Home", "Usage").
+- **Fill the frame.** Product UI must dominate: phone chrome width about **900–1000 px** inside 1080, or desktop letterboxed edge-to-edge. Ban tiny floating phone or browser cards with fat empty gutters. Ban `object-fit: cover` and Ken Burns on landscape shots in 9:16.
+- **Readable at a glance.** Headlines ≥ 84 px, supporting ≥ 44 px, code ≥ 36 px, ≤ 8 lines of code. Hold long enough to read twice.
+- **Safe area.** Keep key text 80 px from the sides and 100 px from the top and bottom.
+- **Silent-first.** Every beat lands with sound off. Music only if a real track exists; never sine or noise pads.
+- **Edit like a reel.** Hard cuts or short crossfades between beats; punch panels for claims; hook cuts fastest; proof holds longest. Flat 4 s-every-scene pacing and fade-only slideshows are banned.
+- **Brand.** Newest mark by path, mtime, and live navbar; copy into `.readme2reel/public/`. Never invent a wordmark.
+- **Format.** 1080×1920 by default; 1920×1080 only on request.
 
 ### Build, preview, render
 
-1. Scaffold the video project in `reel/`, so it never mixes with the project's own build.
-2. Generate scenes from a data file, `reel/src/reel-data.ts`, that holds the storyboard's text and timings. When the docs change later, you re-sync that file and the reel follows.
-3. Open the preview (Remotion Studio). Before you show the user, scrub stills for bad crop, wrong logo, and illegible UI, not only readable captions and source lines. For app reels, "Can I recognize the product UI?" is a hard fail.
-4. Render to `reel/out/` only when the user explicitly asks for an export.
-5. Tell the user which docs lines each scene came from, so a reviewer can check the reel the way they check a diff.
+1. Scaffold under `.readme2reel/` and ensure it is gitignored. Copy `templates/remotion/` components and scenes into `src/`.
+2. Capture product UI (phone ~390×844) into `.readme2reel/public/shots/` — use `scripts/capture-ui.mjs` or the same Playwright pattern.
+3. Keep all on-screen copy and cursor waypoints in `.readme2reel/src/reel-data.ts` with a `source` per scene.
+4. Open Remotion Studio early. **Play** the timeline (do not only scrub stills). Hard fails: no cursor/click or other action on the reveal beat, opens on logo, cannot state the one takeaway, product UI too small or illegible, wrong logo, landscape cover-crop, screenshot slideshow, more than five scenes of page tour.
+5. **Render** `npx remotion render Reel out/reel.mp4`. Tell the user the absolute path. Skipping the MP4 after "make a reel" is a fail.
+6. Report which docs lines each scene came from.
 
-When the docs change later, a re-sync in embedded mode should also update `reel/src/reel-data.ts`, so the reel and the README stay in step.
+When docs change later, a re-sync in embedded mode should also update `.readme2reel/src/reel-data.ts` if that file exists.

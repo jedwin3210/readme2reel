@@ -1,6 +1,6 @@
 schema_version: "1.0"
 name: reel-storyboard
-description: Reel mode audits first, then writes reel/storyboard.md from verified docs, without scaffolding or rendering.
+description: Reel mode audits first, then writes .readme2reel/storyboard.md from verified docs, without scaffolding or rendering.
 tags: [reel, node]
 runs: 3
 context:
@@ -14,14 +14,18 @@ graders:
     tool: Skill
   - type: file_exists
     name: storyboard-written
-    path: reel/storyboard.md
+    path: .readme2reel/storyboard.md
   - type: file_exists
-    name: no-project-scaffolded
+    name: no-visible-reel-scaffold
     path: reel/package.json
+    exists: false
+  - type: file_exists
+    name: no-hidden-scaffold-yet
+    path: .readme2reel/package.json
     exists: false
   - type: regex
     name: real-install-command
-    target: { source: file, path: reel/storyboard.md }
+    target: { source: file, path: .readme2reel/storyboard.md }
     pattern: "npm install slugmint"
   - type: regex
     name: readme-untouched

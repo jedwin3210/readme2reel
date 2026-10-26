@@ -1,6 +1,6 @@
 schema_version: "1.0"
 name: reel-web-storyboard
-description: Reel mode storyboards a marketing web app around product UI, not a CLI install slideshow.
+description: Reel mode storyboards a marketing web app around product UI under .readme2reel/, not a CLI install slideshow or logo tour.
 tags: [reel, web-app]
 runs: 3
 context:
@@ -14,18 +14,22 @@ graders:
     tool: Skill
   - type: file_exists
     name: storyboard-written
-    path: reel/storyboard.md
+    path: .readme2reel/storyboard.md
   - type: file_exists
-    name: no-project-scaffolded
+    name: no-visible-reel-scaffold
     path: reel/package.json
+    exists: false
+  - type: file_exists
+    name: no-hidden-scaffold-yet
+    path: .readme2reel/package.json
     exists: false
   - type: regex
     name: product-surface-named
-    target: { source: file, path: reel/storyboard.md }
+    target: { source: file, path: .readme2reel/storyboard.md }
     pattern: "(?i)(three-pane|editor|preview|phone|viewport|desktop|letterbox|screenshot|product UI|UI)"
   - type: regex
     name: site-cta
-    target: { source: file, path: reel/storyboard.md }
+    target: { source: file, path: .readme2reel/storyboard.md }
     pattern: "notedesk\\.example"
   - type: regex
     name: readme-untouched

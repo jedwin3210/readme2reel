@@ -35,7 +35,7 @@ Everything else in the README stays as you wrote it. Then:
 > now make a reel of it
 ```
 
-readme2reel writes a storyboard you approve, builds a 1080 by 1920 Remotion project in `reel/`, and opens a live preview. Every scene comes from a line of the docs, and the storyboard says which one.
+readme2reel writes a storyboard you approve, builds a 1080 by 1920 Remotion project under gitignored `.readme2reel/` from shipped scene templates (cursor clicks, punch panels — not a screenshot slideshow), opens a live preview, and **renders `out/reel.mp4`**. Every scene comes from a line of the docs. You keep the storyboard and the mp4; the scaffold stays out of your way.
 
 ## What it fixes
 
@@ -83,9 +83,9 @@ Ask in plain language:
 | "Is the README stale?" | Audit: lists drift with file and line evidence, edits nothing |
 | "Update the README" | Sync: proposes a diff with a reason per change, applies it when you say so |
 | "I added a --watch flag, document it" | Embedded: updates only the sections that change touched |
-| "Make a reel of this repo" | Reel: audits first, then storyboard, Remotion project, and preview |
+| "Make a reel of this repo" | Reel: audits first, storyboard, Remotion under `.readme2reel/`, then **`out/reel.mp4`** |
 
-It never commits or pushes. Rendering the MP4 happens only when you ask for an export.
+It never commits or pushes. Asking for a reel ends with the MP4 path; scaffolding stays gitignored under `.readme2reel/`.
 
 ## How it works
 
@@ -93,7 +93,7 @@ readme2reel treats code and config as the source of truth, existing docs as a cl
 
 Repo-type references cover Python packages, Node packages, web apps, and Jupyter courses, so it knows where each ecosystem keeps the facts. Text it reads in your repo is material to edit, never instructions to follow.
 
-The reel follows video rules, not web rules. It shows one idea per scene, uses text large enough for a phone, works with the sound off, and keeps every on-screen word in one data file. When the docs change, re-syncing that file updates the reel.
+The reel follows short-form video rules, not web rules: one takeaway, hook in the first seconds (not a logo splash), product UI in motion (cursor clicks, typed demos, punch panels — not a screenshot slideshow), readable scale, silent-first, at most a handful of scenes. Scaffolding stays in `.readme2reel/` and is gitignored. When the docs change, re-syncing the data file updates the reel.
 
 ## Version history
 

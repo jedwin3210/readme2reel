@@ -1,164 +1,264 @@
 # Reels with Remotion
 
-Read this in reel mode, after the storyboard is approved. Remotion renders React components to video, so the reel is code: reviewable, diffable, and easy to regenerate when the docs change. If the repo already has its own video tooling, use that instead and keep the same storyboard and design rules.
+Read this in reel mode after the storyboard is approved. Remotion renders React components to video, so the reel is code you can regenerate when the docs change. If the repo already has video tooling, use that and keep the same craft rules.
 
-## Set up
+Craft patterns here borrow from strong short-form and product-demo practice (hook in 3 s, beat sheet before motion, product fills the frame, **cursor clicks and punch cuts**). Truthfulness still wins: every on-screen claim needs a `source` line from the verified docs or code.
 
-Scaffold into `reel/` so the video project never mixes with the project's own build or dependencies:
+**This is a video.** If pausing any frame looks the same as the next half-second, you built a slideshow. Fix the motion before you polish captions.
+
+## Hide the dump
+
+Users do not want a Remotion monorepo in their tree. Scaffold **only** under `.readme2reel/`:
 
 ```bash
-npx create-video@latest --yes --blank --no-tailwind reel
-cd reel && npm i
+npx create-video@latest --yes --blank --no-tailwind .readme2reel
+cd .readme2reel && npm i
 npx remotion studio
 ```
 
-`create-video` refuses a non-empty folder. If `reel/` exists, check whether it is already a Remotion project (a `remotion.config.ts` file or `remotion` in package.json) and reuse it. Open Studio as soon as the project runs and keep it open, so the user can watch scenes appear and steer.
+Then ensure the project root `.gitignore` contains:
 
-Add `reel/node_modules` and `reel/out` to the project's `.gitignore` if they are not already covered.
+```
+.readme2reel/
+```
+
+If an old visible `reel/` folder exists from a prior run, leave it alone unless the user asks to delete it; put new work in `.readme2reel/`.
+
+`create-video` refuses a non-empty folder. If `.readme2reel/` already looks like Remotion (`remotion.config.ts` or `remotion` in package.json), reuse it. Open Studio as soon as the project runs and keep it open.
+
+Deliverables the user cares about:
+
+- Storyboard in chat + `.readme2reel/storyboard.md`
+- Preview in Remotion Studio
+- Optional export: `.readme2reel/out/reel.mp4` (copy elsewhere only if they ask)
+
+Do not propose committing the scaffold, `node_modules`, lockfile, QA stills, or `out/`.
 
 ## Structure
 
 ```
-reel/
+.readme2reel/
+  storyboard.md
   src/
-    Root.tsx          registers the composition
-    Reel.tsx          sequences the scenes
-    reel-data.ts      every word and timing on screen, generated from the storyboard
-    scenes/           one component per scene type
+    Root.tsx
+    Reel.tsx
+    reel-data.ts      every on-screen word + timing + source
+    scenes/
+  public/             logos, stills, short recordings (copied in)
   out/                renders, only when asked
 ```
 
-Keep all text in `reel-data.ts`. Scenes take props and hold no copy of their own, so a docs re-sync only touches the data file:
+Copy `templates/remotion/` from the skill into `.readme2reel/src/` before inventing components. Prefer those PhoneFrame, Cursor, Hook, Demo, Punch, and Cta scenes. Capture product UI with `scripts/capture-ui.mjs` (phone 390×844 @2x).
+
+Keep all copy and motion cues in `reel-data.ts`. Scenes take props only:
 
 ```ts
 export const FPS = 30;
 export const reel = {
   repo: "github.com/owner/name",
+  takeaway: "NoteDesk gives writers a three-pane desk in the browser",
   accent: "#4f8cff",
   scenes: [
-    { kind: "title", seconds: 3, text: "Sync your README with your code", source: "README.md:3" },
-    { kind: "command", seconds: 4, text: "pip install repotool", source: "pyproject.toml:2" },
-    { kind: "code", seconds: 10, lines: ["repotool sync --dry-run"], source: "README.md:31" },
-    { kind: "bullets", seconds: 8, items: ["Fixes stale flags", "Finds missing env vars"], source: "README.md:12-18" },
-    { kind: "cta", seconds: 3, text: "github.com/owner/name", source: "package metadata" },
+    { kind: "hook", seconds: 3, text: "A clean desk for every draft", source: "README.md:3" },
+    {
+      kind: "demo",
+      seconds: 8,
+      shot: "shots/desk.png", // or recording.webm
+      caption: "Folders · editor · preview",
+      cursor: [
+        { at: 0, x: 0.2, y: 0.75 },
+        { at: 24, x: 0.55, y: 0.42, click: true },
+        { at: 60, x: 0.72, y: 0.55, click: true },
+      ],
+      source: "README.md:7",
+    },
+    { kind: "cta", seconds: 3, text: "notedesk.example", source: "README.md:11" },
   ],
 } as const;
 ```
 
-The `source` field never renders. It lets a reviewer trace every on-screen claim back to a doc or code line.
+`source` never renders. It is the review trail.
 
-## Register the composition
+## Craft: make a video people finish
 
-Derive the duration from the data so it can never drift from the scenes:
+### One takeaway
+
+Write `reel.takeaway` before any scene. Every beat serves that line. If a scene does not support it, cut the scene.
+
+### Hook is not the logo
+
+Viewers decide in ~3 seconds. Open on payoff, tension, or a verified claim over the product UI. Logo-as-scene-1 fails. A small mark in the corner is fine for the whole reel.
+
+### Five beats, not a site tour
+
+Hook → Problem → Reveal → Proof → CTA. For a homepage, **one** primary screen plus at most one proof screen beats five nav pages with captions like "Usage" and "Partner". If the README lists many features, pick the two that prove the takeaway.
+
+### Pacing
+
+| Scene type | Target | Notes |
+|---|---|---|
+| Hook | 2.5–3.5 s | Fastest cut |
+| Text / problem | 2.5–4 s | ~2.5 words/sec reading time |
+| UI / reveal | 5–8 s | Eye needs dwell time |
+| Proof | 4–6 s | Hold; do not undercut with motion |
+| CTA | 2.5–3.5 s | One URL, readable |
+
+Ban flat identical durations. If the reel runs long, cut a scene — do not speed every beat up. Social ceiling: **30 s**. Prefer **15–25 s**.
+
+### Captions
+
+One short sentence per scene that states the idea. Fail captions that only name the page ("Home", "Materials", "Hubs").
+
+## Motion: edit a video, do not slideshow PNGs
+
+A static full-bleed screenshot held for four seconds is not a beat. Prefer, in order:
+
+1. **Short screen recording** of the real product (a few seconds of the key action), then a synthetic cursor on top if the capture dropped the pointer.
+2. **Still UI + animated cursor** that moves with easing and pulses a **click ring** on the control that matters.
+3. **Typed / state-change demos** for CLIs: characters appear by frame; a flag highlights after.
+4. **Punch panels** for claims: big type or a number slams in (~0.2–0.35 s overshoot then settle), holds, hard-cuts to the next beat.
+
+### Cursor + click (required on app reveal beats)
+
+Put an SVG pointer on the **top** layer. Waypoints use fractions of the frame so scale survives:
 
 ```tsx
-import { Composition } from "remotion";
-import { Reel } from "./Reel";
-import { FPS, reel } from "./reel-data";
+const PATH = [
+  { at: 0, x: 0.18, y: 0.82 },
+  { at: 28, x: 0.62, y: 0.38 }, // arrives + clicks
+];
+const CLICK_AT = [28];
+// interpolate x/y over PATH frames with Easing.inOut(Easing.cubic), clamp ends
+// on click: ring scale 0.4→1.6 and opacity 1→0 over ~14 frames from tip
+```
 
+Details that read as real:
+
+- Hotspot is the **tip** of the arrow, not the center of the SVG box.
+- Ease in/out per segment; linear cursors look robotic.
+- Hold on the target for several frames after the click so the UI change (or caption) can register.
+- For touch/mobile sims, a finger **dot** variant is fine; still show the tap ripple.
+
+Optional: install a maintained cursor helper (for example `@snapcn/cursor-track` via shadcn) if the project already uses that stack — props-only, do not invent component names. Hand-rolled SVG cursor above is always enough.
+
+### Flash / punch panels
+
+Use for hook tension, one proof number, or a hard claim between UI beats:
+
+- Full-bleed or large card, brand accent, **one** line (≤8 words).
+- Enter fast (spring or short overshoot), hold, **hard cut** out — no slow fade soup.
+- Pair with the product: flash claim → cut to the click that proves it.
+
+### Transitions
+
+- Prefer `Series` hard cuts between beats. Short `@remotion/transitions` crossfades (≤8–10 frames) only when a hard cut would flash.
+- Do not dissolve every scene equally — that is slideshow language.
+- Never Ken Burns a landscape screenshot to fake energy; energy comes from cuts, clicks, and type.
+
+### Recordings vs stills
+
+- If the repo or local preview can produce a short `.webm`/`.mp4` of the real flow, prefer that for the reveal beat.
+- Stills are plates for cursor demos, not the whole reel.
+- Never invent UI chrome, labels, or fake dashboards. Capture what exists.
+
+### Hard motion fails
+
+- Three or more consecutive scenes that are only a screenshot + caption with no cursor, type, or panel motion
+- Cursor that teleports or moves at constant linear speed with no ease
+- Click with no ring / no hold
+- "Energy" attempted only via Ken Burns or endless drift
+
+## Scale: product must dominate
+
+Vertical canvas is 1080×1920. Empty gutters kill credibility.
+
+### Phone UI (preferred for 9:16)
+
+- Capture at ~390×844 (or @2x 780×1688). Prefer a real mobile viewport, not a shrunk desktop.
+- Device chrome width **900–1000 px** (about 83–93% of frame width).
+- Keep caption as a short overlay in the safe area or a thin band that still leaves the phone ≥ ~70% of frame height. Do not stack a large title above a tiny phone.
+- `object-fit: contain` + `object-position: top center` inside the phone screen. Never `cover`, never Ken Burns on the screenshot.
+- Example shell:
+
+```tsx
+const PHONE_W = 740; // inside 1080
+const BEZEL = 14;
+const SCREEN_W = PHONE_W - BEZEL * 2;
+const SCREEN_H = Math.round(SCREEN_W * (844 / 390));
+```
+
+### Desktop UI
+
+- Use only when the product is clearly desktop-first and a phone capture would lie.
+- Full-bleed width 1080, letterbox bars above/below, `object-fit: contain`. No floating Mac-window chrome card with huge side margins.
+- If hero type truncates ("…Studen"), the capture is wrong — recapture wider or switch to phone.
+
+### Hard scale fails
+
+- Phone or browser card under ~700 px wide in a 1080 frame
+- More than ~12% empty margin on both sides of the product
+- UI type you cannot read without squinting
+- Landscape screenshot force-filled with `object-fit: cover`
+
+## Brand
+
+1. Prefer what the live site or navbar actually loads.
+2. Prefer newer mtimes and current paths over `old/`, `v1/`, `legacy/`.
+3. Prefer SVG or high-res PNG over a favicon.
+4. Copy into `.readme2reel/public/` and note the source path in the storyboard.
+
+No invented wordmarks. No mark → set the name in type.
+
+## Audio
+
+Optional. Silent-first still wins.
+
+- Real track from the repo → `<Audio>` + `staticFile()`.
+- No track → stay silent. Never generate sine, noise, or placeholder hums.
+
+## Remotion mechanics
+
+Derive duration from data:
+
+```tsx
 const total = reel.scenes.reduce((s, x) => s + Math.round(x.seconds * FPS), 0);
-
-export const RemotionRoot = () => (
-  <Composition id="Reel" component={Reel} durationInFrames={total} fps={FPS} width={1080} height={1920} />
-);
+<Composition id="Reel" component={Reel} durationInFrames={total} fps={FPS} width={1080} height={1920} />
 ```
 
-Register a second composition at 1920 by 1080 only when the user asks for landscape. Lay out scenes with flexbox so both formats share the same components. Subtract transition overlaps from the total if you add transitions.
-
-## Sequence the scenes
-
-Use `Series` for back-to-back scenes, or `TransitionSeries` from `@remotion/transitions` for crossfades. Each scene starts at its own frame 0, which keeps animations local:
+Sequence with `Series`. Drive motion from `useCurrentFrame()` + clamped `interpolate()` — CSS transitions and `setTimeout` do not render.
 
 ```tsx
-import { AbsoluteFill, Series } from "remotion";
-
-export const Reel = () => (
-  <AbsoluteFill style={{ backgroundColor: "#0b0d12" }}>
-    <Series>
-      {reel.scenes.map((s, i) => (
-        <Series.Sequence key={i} durationInFrames={Math.round(s.seconds * FPS)}>
-          <Scene scene={s} />
-        </Series.Sequence>
-      ))}
-    </Series>
-  </AbsoluteFill>
-);
-```
-
-## Animate
-
-Drive every motion from `useCurrentFrame()` with `interpolate()`, and clamp it. CSS transitions and `setTimeout` do not render, because Remotion captures each frame independently.
-
-```tsx
-const frame = useCurrentFrame();
-const { fps } = useVideoConfig();
 const enter = interpolate(frame, [0, 0.3 * fps], [0, 1], {
   easing: Easing.bezier(0.16, 1, 0.3, 1),
   extrapolateLeft: "clamp",
   extrapolateRight: "clamp",
 });
-// style={{ opacity: enter, translate: `0px ${(1 - enter) * 40}px` }}
 ```
 
-Type a command by slicing the string by frame, and finish typing by the middle of the scene so the viewer can read the whole line:
+Type commands by slicing the string by frame; finish by mid-scene so the line can be read. Load fonts with `@remotion/google-fonts` or `staticFile()`, never a CSS URL at render time.
 
-```tsx
-const chars = Math.floor(interpolate(frame, [0.2 * fps, 1.6 * fps], [0, text.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }));
-const shown = text.slice(0, chars);
-```
-
-Highlight a changed flag or env var with a background that grows in after the line is typed. That is the reel's version of a diff.
-
-## Text and code
-
-- Load fonts with `@remotion/google-fonts` or `staticFile()` plus a local font, never from a CSS URL at render time.
-- Use a monospace font for commands and code, 36 px or larger. Wrap nothing: if a line does not fit, shorten the example or split the scene.
-- Keep code to 8 lines per scene. Syntax colors are optional. A single accent color on the part that matters reads better on a phone.
-- Put images, such as a logo, in `reel/public/` and load them with `staticFile()` and `<Img>`.
-
-## Brand
-
-Prefer the newest logo or mark in the repo. When several candidates exist:
-
-1. Prefer what the live site or shared navbar and header actually render (import path, `public/` asset referenced from layout components).
-2. Prefer newer file mtimes and paths that look current (`logo.svg`, `brand/`, `assets/mark`) over archives (`old/`, `v1/`, `legacy/`, dated folders).
-3. Prefer SVG or high-resolution PNG over a tiny favicon when both exist.
-4. Copy the chosen file into `reel/public/` and reference it with `staticFile()`. Note the source path in the storyboard so a reviewer can check it.
-
-Do not invent a wordmark. If the repo has no mark, use the project name in type.
-
-## Product UI
-
-When the repo is a website or app, the reel's job is to show the product, not a terminal theme about the product.
-
-- Capture or compose real screens: existing screenshots in the repo, Storybook stills, or a local preview you open only for the reel (this is the reel-mode tooling exception). Prefer the primary surface the README demos.
-- Fit each screen into a **phone viewport** about 390 by 844 centered in the 1080 by 1920 frame, or show a **letterboxed full-width desktop** shot with letterbox bars above and below. The whole UI stays visible.
-- **Ban** `object-fit: cover` and Ken Burns (slow pan/zoom) on landscape screenshots inside a 9:16 frame. Those crop chrome and type until the product is unrecognizable.
-- Use `object-fit: contain` (or an explicit phone/desktop frame) so aspect ratio is preserved. Soft background behind letterboxing is fine; cropping the screenshot to fill the frame is not.
-- Docs or CLI beats are allowed only as a short aside when the README's product is still the UI. If install and typed commands are the whole arc, you picked the wrong form.
-
-## Audio
-
-Audio is optional. Silent-first still wins: every beat must land with the sound off.
-
-- If the user asks for music or the repo already ships a licensed track, wire that real file with Remotion's `<Audio>` and `staticFile()`.
-- If there is no real track, ship the reel silent. Do not generate sine tones, noise pads, or placeholder hums to fill the timeline.
+Play the composition in Studio at 1× while you build. Scrubbing stills alone will not catch a missing click.
 
 ## Check before showing
 
-- Scrub each scene in Studio at full speed. If you cannot read it twice, lengthen it or cut words.
-- Check the first frame of each scene. A blank or half-faded first frame looks broken as a thumbnail.
-- Compare every on-screen string with `reel-data.ts` and its `source`. Nothing may appear that the data file does not hold.
-- Export or scrub mid-scene stills and fail the cut when any of these are true: the wrong or outdated logo, a cropped landscape screenshot that hides the product, or UI type and chrome you cannot recognize at a glance. For app reels, "Can I recognize the product UI?" is a hard fail, even when captions and source lines are correct.
+Answer out loud (or in the storyboard notes):
+
+1. What is the one takeaway?
+2. Does the first 3 s sell that takeaway without a logo splash?
+3. Can I recognize the product UI at a glance, at full size?
+4. Did something **move or get clicked** on the reveal beat?
+5. Would I keep watching muted?
+
+Then play the timeline and grab mid-beat stills. Fail the cut for: no cursor/click or other action on reveal, wrong logo, cover-crop, illegible UI, tiny floating device, screenshot slideshow, page-tour, invented claims, or captions that are only page titles.
 
 ## Render
 
-Render only when the user explicitly asks for an export:
+Always after a reel build (the MP4 is the deliverable). Re-render when they ask for changes:
 
 ```bash
-cd reel
+cd .readme2reel
 npx remotion render Reel out/reel.mp4
 npx remotion still Reel out/thumbnail.png --frame=45
 ```
 
-Report the output path, duration, and size. Leave rendered files out of version control unless the user wants them committed.
+Report path, duration, and size. Leave `.readme2reel/` out of version control.
