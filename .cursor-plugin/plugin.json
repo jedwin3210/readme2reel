@@ -1,7 +1,7 @@
 {
   "name": "readme2reel",
   "description": "Bring a repository's README and docs back in line with what the code does today, then turn the verified docs into a short video reel.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Edwin Vargas Navarro"
   },

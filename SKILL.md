@@ -4,7 +4,7 @@ description: |
   Bring a repository's README and docs back in line with what the code does today, then turn the verified docs into a short video reel. Use whenever the user says "update the README", "docs are out of date", "sync docs with code", "I added X, document it", "someone cloned this and got confused", "make a video of this repo", "turn the README into a reel", "launch video", "demo video for the docs", or asks whether the docs still match the code. Also use after adding, renaming, or removing a feature, flag, command, env var, or module. Fixes stale install commands, renamed flags, removed features, missing env vars, wrong paths, and undocumented modules with minimal diffs, and builds the reel as editable Remotion code from facts it has checked.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # readme2reel: true docs, then a reel of them
@@ -104,7 +104,16 @@ Only in reel mode, and only from docs that passed Step 2. Read `references/reel.
 
 Write `reel/storyboard.md` and show it to the user before you build anything. Changing a storyboard is cheap. Changing an animated scene is not. Each scene gets a duration, the one thing the viewer should notice, the on-screen text, and the doc line it comes from.
 
-Default arc, 30 to 45 seconds:
+**Pick the form from the product surface, not from habit.** Storyboard the thing a user opens first. For a website, app, or marketing homepage, that is the real UI. For a CLI or library, that is the command or import. Do not default a product or homepage repo to an install → typed command → bullets slideshow; use that arc only when the product itself is the CLI or API.
+
+Default arc when the product is a website or app, 30 to 45 seconds:
+
+1. **Hook, 3 s:** what it does, in the README's one-line description, with the current brand mark.
+2. **Product UI, 10 to 18 s:** real screens from the repo or a running preview, one surface per beat.
+3. **Proof, 6 to 9 s:** at most three verified claims from the README, one per beat.
+4. **Call to action, 3 s:** the site URL or signup path from the docs.
+
+Default arc when the product is a CLI or library, 30 to 45 seconds:
 
 1. **Hook, 3 s:** what the project does, in the README's own one-line description.
 2. **Problem, 4 to 6 s:** the pain it removes, only if the README states one.
@@ -117,21 +126,23 @@ Cut any scene the docs cannot support. A 20-second true reel beats a 45-second p
 
 ### Design rules
 
-You are designing a video, not a web page. A viewer gets each frame once, at the video's pace, often muted on a phone.
+You are designing a video, not a web page. A viewer gets each frame once, at the video's pace, often muted on a phone. `references/reel.md` has the layout and asset detail.
 
 - **One idea per scene.** Build the frame around the thing the viewer should notice first.
 - **Readable at a glance.** Use at least 84 px headlines and 44 px supporting text at 1080 px width. Show at most 8 lines of code per scene, at 36 px or larger. Hold each scene long enough to read it twice.
 - **Safe area.** Keep key text 80 px from the sides and 100 px from the top and bottom, so platform UI does not cover it.
-- **Silent-first.** Every point must land with the sound off. Voiceover and music are optional extras.
+- **Silent-first.** Every point must land with the sound off. Audio is optional. If you add music, use a real track from the repo or skip; never invent sine or noise pads. Silent-first still wins.
 - **Motion with purpose.** Animate to direct attention, such as typing a command or highlighting a flag. Prefer quick eased entrances, roughly 0.3 s, over constant movement.
-- **The project's look.** Take colors, logo, and fonts from the repo when it has them, such as a logo file or a docs theme. Otherwise use one neutral palette with one accent color.
+- **Brand.** Prefer the newest logo or mark in the repo. Rank by path name, file mtime, and what the live site or navbar uses, then copy that file into `reel/public/`.
+- **Real UI for apps.** If the project is a website or app, the reel must show recognizable product UI: a phone viewport (about 390 by 844 inside the 9:16 frame) or a letterboxed full-width desktop shot. Never use `object-fit: cover` or Ken Burns on a landscape screenshot in a vertical frame.
+- **The project's look.** Take colors and fonts from the repo when it has them. Otherwise use one neutral palette with one accent color.
 - **Format.** Build 1080 by 1920 vertical by default. Add a 1920 by 1080 landscape version on request.
 
 ### Build, preview, render
 
 1. Scaffold the video project in `reel/`, so it never mixes with the project's own build.
 2. Generate scenes from a data file, `reel/src/reel-data.ts`, that holds the storyboard's text and timings. When the docs change later, you re-sync that file and the reel follows.
-3. Open the preview (Remotion Studio) and let the user steer.
+3. Open the preview (Remotion Studio). Before you show the user, scrub stills for bad crop, wrong logo, and illegible UI, not only readable captions and source lines. For app reels, "Can I recognize the product UI?" is a hard fail.
 4. Render to `reel/out/` only when the user explicitly asks for an export.
 5. Tell the user which docs lines each scene came from, so a reviewer can check the reel the way they check a diff.
 

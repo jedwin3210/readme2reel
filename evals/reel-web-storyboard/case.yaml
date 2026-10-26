@@ -1,0 +1,33 @@
+schema_version: "1.0"
+name: reel-web-storyboard
+description: Reel mode storyboards a marketing web app around product UI, not a CLI install slideshow.
+tags: [reel, web-app]
+runs: 3
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 30
+  allowed_tools: [Read, Glob, Grep, Skill, Edit, Write]
+graders:
+  - type: tool_used
+    name: skill-fired
+    tool: Skill
+  - type: file_exists
+    name: storyboard-written
+    path: reel/storyboard.md
+  - type: file_exists
+    name: no-project-scaffolded
+    path: reel/package.json
+    exists: false
+  - type: regex
+    name: product-surface-named
+    target: { source: file, path: reel/storyboard.md }
+    pattern: "(?i)(three-pane|editor|preview|phone|viewport|desktop|letterbox|screenshot|product UI|UI)"
+  - type: regex
+    name: site-cta
+    target: { source: file, path: reel/storyboard.md }
+    pattern: "notedesk\\.example"
+  - type: regex
+    name: readme-untouched
+    target: { source: file, path: README.md }
+    pattern: "A focused notes app for writers who want a clean desk\\."

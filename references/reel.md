@@ -116,11 +116,40 @@ Highlight a changed flag or env var with a background that grows in after the li
 - Keep code to 8 lines per scene. Syntax colors are optional. A single accent color on the part that matters reads better on a phone.
 - Put images, such as a logo, in `reel/public/` and load them with `staticFile()` and `<Img>`.
 
+## Brand
+
+Prefer the newest logo or mark in the repo. When several candidates exist:
+
+1. Prefer what the live site or shared navbar and header actually render (import path, `public/` asset referenced from layout components).
+2. Prefer newer file mtimes and paths that look current (`logo.svg`, `brand/`, `assets/mark`) over archives (`old/`, `v1/`, `legacy/`, dated folders).
+3. Prefer SVG or high-resolution PNG over a tiny favicon when both exist.
+4. Copy the chosen file into `reel/public/` and reference it with `staticFile()`. Note the source path in the storyboard so a reviewer can check it.
+
+Do not invent a wordmark. If the repo has no mark, use the project name in type.
+
+## Product UI
+
+When the repo is a website or app, the reel's job is to show the product, not a terminal theme about the product.
+
+- Capture or compose real screens: existing screenshots in the repo, Storybook stills, or a local preview you open only for the reel (this is the reel-mode tooling exception). Prefer the primary surface the README demos.
+- Fit each screen into a **phone viewport** about 390 by 844 centered in the 1080 by 1920 frame, or show a **letterboxed full-width desktop** shot with letterbox bars above and below. The whole UI stays visible.
+- **Ban** `object-fit: cover` and Ken Burns (slow pan/zoom) on landscape screenshots inside a 9:16 frame. Those crop chrome and type until the product is unrecognizable.
+- Use `object-fit: contain` (or an explicit phone/desktop frame) so aspect ratio is preserved. Soft background behind letterboxing is fine; cropping the screenshot to fill the frame is not.
+- Docs or CLI beats are allowed only as a short aside when the README's product is still the UI. If install and typed commands are the whole arc, you picked the wrong form.
+
+## Audio
+
+Audio is optional. Silent-first still wins: every beat must land with the sound off.
+
+- If the user asks for music or the repo already ships a licensed track, wire that real file with Remotion's `<Audio>` and `staticFile()`.
+- If there is no real track, ship the reel silent. Do not generate sine tones, noise pads, or placeholder hums to fill the timeline.
+
 ## Check before showing
 
 - Scrub each scene in Studio at full speed. If you cannot read it twice, lengthen it or cut words.
 - Check the first frame of each scene. A blank or half-faded first frame looks broken as a thumbnail.
 - Compare every on-screen string with `reel-data.ts` and its `source`. Nothing may appear that the data file does not hold.
+- Export or scrub mid-scene stills and fail the cut when any of these are true: the wrong or outdated logo, a cropped landscape screenshot that hides the product, or UI type and chrome you cannot recognize at a glance. For app reels, "Can I recognize the product UI?" is a hard fail, even when captions and source lines are correct.
 
 ## Render
 

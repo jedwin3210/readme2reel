@@ -33,8 +33,10 @@ Keep the skill portable. Do not write instructions that limit it to one agent to
 python3 scripts/validate-package.py
 npx skills add . --list
 claude plugin validate --strict .
-claude plugin eval . --scaffold --allow-tools Edit Write --runs 1
+claude plugin eval . --scaffold --allow-tools Edit Write --runs 1 --ablation none
 ```
+
+Do not install this skill into the repo via `npx skills add` (that creates `.agents/` and makes `claude plugin eval` discover the suite twice). Eval runs real Claude Code sessions on your plan; `--ablation none` skips the no-plugin baseline and roughly halves quota use. Re-run after a session-limit reset if the suite aborts early.
 
 ## Writing style
 

@@ -69,7 +69,8 @@ for label, manifest in (("Claude", PLUGIN), ("Cursor", CURSOR)):
 if "skills" in PLUGIN or "skills" in CURSOR:
     raise SystemExit("Omit skills from the plugin manifests so the root SKILL.md loads and evals/ stays outside the skill path")
 
-skill_files = {p.relative_to(ROOT) for p in ROOT.rglob("SKILL.md") if not {".git", "dist"} & set(p.parts)}
+skip_parts = {".git", "dist", ".agents", ".claude", ".cursor", ".codex", "node_modules"}
+skill_files = {p.relative_to(ROOT) for p in ROOT.rglob("SKILL.md") if not skip_parts & set(p.parts)}
 if skill_files != {Path("SKILL.md")}:
     raise SystemExit(f"Keep one SKILL.md at the repo root; found {sorted(map(str, skill_files))}")
 

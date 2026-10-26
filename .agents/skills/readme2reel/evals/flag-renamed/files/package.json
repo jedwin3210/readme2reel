@@ -1,8 +1,0 @@
-{
-  "name": "shotlist",
-  "version": "2.1.0",
-  "description": "Capture full-page screenshots of a list of URLs.",
-  "type": "module",
-  "bin": { "shotlist": "bin/shotlist.js" },
-  "dependencies": { "commander": "^14.0.0" }
-}

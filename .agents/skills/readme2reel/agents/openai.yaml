@@ -1,4 +1,0 @@
-interface:
-  display_name: "readme2reel"
-  short_description: "Sync the README with the code, then make a reel of it"
-  default_prompt: "Use $readme2reel to check this repo's README against the code and propose fixes."
