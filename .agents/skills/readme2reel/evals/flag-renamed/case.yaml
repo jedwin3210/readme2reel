@@ -1,0 +1,26 @@
+schema_version: "1.0"
+name: flag-renamed
+description: The --out/-d flag was renamed to --output-dir/-o in code; README still shows the old flag. Sync mode proposes a diff without applying it.
+tags: [sync, node]
+runs: 3
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 25
+  allowed_tools: [Read, Glob, Grep, Skill, Edit, Write]
+graders:
+  - type: tool_used
+    name: skill-fired
+    tool: Skill
+  - type: regex
+    name: proposes-new-flag
+    target: last_message
+    pattern: "--output-dir"
+  - type: regex
+    name: proposes-new-short-flag
+    target: last_message
+    pattern: "-o, --output-dir"
+  - type: regex
+    name: readme-not-edited-before-approval
+    target: { source: file, path: README.md }
+    pattern: "shotlist urls.txt --out shots/"

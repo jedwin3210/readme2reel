@@ -1,0 +1,27 @@
+schema_version: "1.0"
+name: install-drift
+description: README install command names the wrong distribution; pyproject.toml is the source of truth.
+tags: [sync, python]
+runs: 3
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 25
+  allowed_tools: [Read, Glob, Grep, Skill, Edit, Write]
+graders:
+  - type: tool_used
+    name: skill-fired
+    tool: Skill
+  - type: regex
+    name: fixed-install-command
+    target: { source: file, path: README.md }
+    pattern: "pip install tidyjson\\b"
+  - type: regex
+    name: old-command-gone
+    target: { source: file, path: README.md }
+    pattern: "pip install tidy-json"
+    match: not_contains
+  - type: regex
+    name: rest-of-readme-kept
+    target: { source: file, path: README.md }
+    pattern: "Keys come out sorted, so diffs stay small\\."

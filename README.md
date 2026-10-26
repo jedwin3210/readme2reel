@@ -1,5 +1,7 @@
 # readme2reel
 
+[![skills.sh](https://skills.sh/b/jedwin3210/readme2reel)](https://skills.sh/jedwin3210/readme2reel)
+
 readme2reel is an agent skill that makes your README tell the truth, then turns it into a short video. It reads your code and config, fixes the docs where they drifted, and builds a reel from the corrected docs as editable [Remotion](https://www.remotion.dev) code. It works in Claude Code, Codex, Claude.ai, and any other agent that supports skills.
 
 Sync comes first because a video made from a stale README spreads the wrong install command to more people, faster.

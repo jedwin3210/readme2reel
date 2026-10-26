@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "readme2reel": {
+      "source": "jedwin3210/readme2reel",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "0ca2f104f30f063823bc9d488c48625c18d01908e78e07a5c3c84cf8b5816a4f"
+    }
+  }
+}
