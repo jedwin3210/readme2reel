@@ -1,0 +1,22 @@
+schema_version: "1.0"
+name: readme-correct
+description: The README already matches the code. The skill must say so and change nothing.
+tags: [no-op, node]
+runs: 3
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 20
+  allowed_tools: [Read, Glob, Grep, Skill, Edit, Write]
+graders:
+  - type: tool_used
+    name: skill-fired
+    tool: Skill
+  - type: regex
+    name: readme-unchanged
+    target: { source: file, path: README.md }
+    pattern: "# slugmint\\n\\nTurn any string into a URL slug\\.\\n\\n## Install\\n\\n```bash\\nnpm install slugmint\\n```\\n\\nRequires Node\\.js 20 or newer\\.\\n\\n## Usage"
+  - type: regex
+    name: package-json-unchanged
+    target: { source: file, path: package.json }
+    pattern: '"engines": \{ "node": ">=20" \}'

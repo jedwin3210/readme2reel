@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "readme2reel",
+  "owner": {
+    "name": "Edwin Vargas Navarro",
+    "url": "https://github.com/jedwin3210"
+  },
+  "description": "Install readme2reel as a Claude plugin.",
+  "plugins": [
+    {
+      "name": "readme2reel",
+      "source": "./",
+      "description": "Bring a repository's README and docs back in line with what the code does today, then turn the verified docs into a short video reel.",
+      "license": "MIT",
+      "keywords": ["readme", "documentation", "docs-sync", "video", "remotion"]
+    }
+  ]
+}
